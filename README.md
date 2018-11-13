@@ -1,4 +1,4 @@
-# Salesforce DX project template for Salesforce.org Non Profit Success Pack (NPSP)
+# Unofficial Salesforce DX project template for Salesforce.org Non Profit Success Pack (NPSP)
 
 ## About
 This project allow you to pre-install Salesforce.org Non Profit Success Pack (NPSP) with Salesforce DX.

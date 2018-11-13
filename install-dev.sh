@@ -1,17 +1,19 @@
 #!/bin/bash
+# Unofficial Salesforce DX install script for Salesforce.org NonProfite Success Pack (NPSP)
+# https://github.com/pozil/npsp-dx-template
+# Review and update dependencies before installing
 
-# Set parameters
+# Salesforce DX scratch org alias
 ORG_ALIAS="npsp-dev"
 
 ### BEGIN DEPENDENCIES
-CONTACTS_AND_ORGANIZATIONS="04t80000001AWvw" # v3.11 - https://github.com/SalesforceFoundation/Contacts_and_Organizations/releases
-HOUSEHOLDS="04t80000000y8ty" # v3.11 - https://github.com/SalesforceFoundation/Households/releases
-RECURRING_DONATIONS="04t80000000gZsgAAE" # v3.13 - https://github.com/SalesforceFoundation/Recurring_Donations/releases
-RELATIONSHIPS="04t80000000y8kR" # v3.8 - https://github.com/SalesforceFoundation/Relationships/releases
-AFFILIATIONS="04t80000000lTMl" # v3.7 - https://github.com/SalesforceFoundation/Affiliations/releases
-NONPROFIT_SUCCESS_PACK="04t1Y0000011SrnQAE" # v3.143 - https://github.com/SalesforceFoundation/Cumulus/releases
-SALESFORCE1_CONFIG="https://github.com/SalesforceFoundation/Cumulus/releases/download/rel/1.7/sf1.zip"
-NONPROFIT_SUCCESS_PACK_VERSION="3.143"
+CONTACTS_AND_ORGANIZATIONS_PACKAGE="04t80000001AWvw" # v3.11 - https://github.com/SalesforceFoundation/Contacts_and_Organizations/releases
+HOUSEHOLDS_PACKAGE="04t80000000y8ty" # v3.11 - https://github.com/SalesforceFoundation/Households/releases
+RECURRING_DONATIONS_PACKAGE="04t80000000gZsgAAE" # v3.13 - https://github.com/SalesforceFoundation/Recurring_Donations/releases
+RELATIONSHIPS_PACKAGE="04t80000000y8kR" # v3.8 - https://github.com/SalesforceFoundation/Relationships/releases
+AFFILIATIONS_PACKAGE="04t80000000lTMl" # v3.7 - https://github.com/SalesforceFoundation/Affiliations/releases
+NPSP_CORE_PACKAGE="04t1Y0000011SrnQAE" # v3.143 - https://github.com/SalesforceFoundation/Cumulus/releases
+NPSP_CORE_VERSION="3.143" # https://github.com/SalesforceFoundation/Cumulus/releases
 ### END DEPENDENCIES
 
 
@@ -20,66 +22,60 @@ echo "Installing NPSP:"
 echo "- Org alias:      $ORG_ALIAS"
 echo ""
 
+# Reset current path to be relative to script file
+SCRIPT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+cd $SCRIPT_PATH
+
 # Create scratch org
 echo "Creating scratch org..." && \
 sfdx force:org:create -s -f config/project-scratch-def.json -d 30 -a $ORG_ALIAS && \
 echo "" && \
 
-# Reset current path to be relative to script file
-SCRIPT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-cd $SCRIPT_PATH
-
-# Download metadata dependencies to temp folder
-echo "Downloading and unpacking dependencies..." && \
+# Download and extract metadata dependencies to temp folder
+echo "Downloading and extracting metadata dependencies..." && \
 rm -fr temp && \
 mkdir temp && \
 cd temp && \
-curl "https://github.com/SalesforceFoundation/Cumulus/archive/rel/$NONPROFIT_SUCCESS_PACK_VERSION.zip" -L -o npsp.zip && \
-unzip npsp.zip "Cumulus-rel-$NONPROFIT_SUCCESS_PACK_VERSION/unpackaged/*" && \
-mv "Cumulus-rel-$NONPROFIT_SUCCESS_PACK_VERSION/unpackaged/" cumulus && \
-curl $SALESFORCE1_CONFIG -L -o sf1.zip && \
-unzip sf1.zip -d sf1 && \
+curl "https://github.com/SalesforceFoundation/Cumulus/archive/rel/$NPSP_CORE_VERSION.zip" -L -o npsp.zip && \
+unzip npsp.zip "Cumulus-rel-$NPSP_CORE_VERSION/unpackaged/*" && \
+mv "Cumulus-rel-$NPSP_CORE_VERSION/unpackaged/" cumulus && \
 cd .. && \
 echo "" && \
 
 # Install dependencies
-echo "Installing dependency 1/10: Opportunity record types..." && \
+echo "Installing dependency 1/9: Opportunity record types..." && \
 sfdx force:mdapi:deploy -d "temp/cumulus/pre/opportunity_record_types" -w 10 -u $ORG_ALIAS && \
 echo "" && \
 
-echo "Installing dependency 2/10: Contacts and organizations..." && \
-sfdx force:package:install --package $CONTACTS_AND_ORGANIZATIONS -w 10 --noprompt -u $ORG_ALIAS && \
+echo "Installing dependency 2/9: Contacts and organizations..." && \
+sfdx force:package:install --package $CONTACTS_AND_ORGANIZATIONS_PACKAGE -w 10 --noprompt -u $ORG_ALIAS && \
 echo "" && \
 
-echo "Installing dependency 3/10: Households..." && \
-sfdx force:package:install --package $HOUSEHOLDS -w 10 -u $ORG_ALIAS && \
+echo "Installing dependency 3/9: Households..." && \
+sfdx force:package:install --package $HOUSEHOLDS_PACKAGE -w 10 -u $ORG_ALIAS && \
 echo "" && \
 
-echo "Installing dependency 4/10: Recurring donations..." && \
-sfdx force:package:install --package $RECURRING_DONATIONS -w 10 -u $ORG_ALIAS && \
+echo "Installing dependency 4/9: Recurring donations..." && \
+sfdx force:package:install --package $RECURRING_DONATIONS_PACKAGE -w 10 -u $ORG_ALIAS && \
 echo "" && \
 
-echo "Installing dependency 5/10: Relationships..." && \
-sfdx force:package:install --package $RELATIONSHIPS -w 10 -u $ORG_ALIAS && \
+echo "Installing dependency 5/9: Relationships..." && \
+sfdx force:package:install --package $RELATIONSHIPS_PACKAGE -w 10 -u $ORG_ALIAS && \
 echo "" && \
 
-echo "Installing dependency 6/10: Affiliations..." && \
-sfdx force:package:install --package $AFFILIATIONS -w 10 -u $ORG_ALIAS && \
+echo "Installing dependency 6/9: Affiliations..." && \
+sfdx force:package:install --package $AFFILIATIONS_PACKAGE -w 10 -u $ORG_ALIAS && \
 echo "" && \
 
-echo "Installing dependency 7/10: Account record types..." && \
+echo "Installing dependency 7/9: Account record types..." && \
 sfdx force:mdapi:deploy -d "temp/cumulus/pre/account_record_types" -w 10 -u $ORG_ALIAS && \
 echo "" && \
 
-echo "Installing dependency 8/10: Nonprofit success pack..." && \
-sfdx force:package:install --package $NONPROFIT_SUCCESS_PACK -w 10 --noprompt -u $ORG_ALIAS && \
+echo "Installing dependency 8/9: Nonprofit success pack..." && \
+sfdx force:package:install --package $NPSP_CORE_PACKAGE -w 10 --noprompt -u $ORG_ALIAS && \
 echo "" && \
 
-echo "Installing dependency 9/10: Salesforce1 configuration..." && \
-sfdx force:mdapi:deploy -d "temp/sf1" -w 10 -u $ORG_ALIAS && \
-echo "" && \
-
-echo "Installing dependency 10/10: Configuration..." && \
+echo "Installing dependency 9/9: Configuration..." && \
 sfdx force:mdapi:deploy -d post-install-config -w 10 -u $ORG_ALIAS && \
 echo "" && \
 
