@@ -6,20 +6,51 @@
 # Salesforce DX scratch org alias
 ORG_ALIAS="npsp-dev"
 
-### BEGIN DEPENDENCIES
-CONTACTS_AND_ORGANIZATIONS_PACKAGE="04t80000001AWvw" # v3.11 - https://github.com/SalesforceFoundation/Contacts_and_Organizations/releases
-HOUSEHOLDS_PACKAGE="04t80000000y8ty" # v3.11 - https://github.com/SalesforceFoundation/Households/releases
-RECURRING_DONATIONS_PACKAGE="04t80000000gZsgAAE" # v3.13 - https://github.com/SalesforceFoundation/Recurring_Donations/releases
-RELATIONSHIPS_PACKAGE="04t80000000y8kR" # v3.8 - https://github.com/SalesforceFoundation/Relationships/releases
-AFFILIATIONS_PACKAGE="04t80000000lTMl" # v3.7 - https://github.com/SalesforceFoundation/Affiliations/releases
-NPSP_CORE_PACKAGE="04t1Y0000011SrnQAE" # v3.143 - https://github.com/SalesforceFoundation/Cumulus/releases
-NPSP_CORE_VERSION="3.143" # https://github.com/SalesforceFoundation/Cumulus/releases
-### END DEPENDENCIES
-
-
 echo ""
 echo "Installing NPSP:"
 echo "- Org alias:      $ORG_ALIAS"
+echo ""
+
+# Gets the latest version of a GitHub repository
+# Usage:    getLatestVersion repo
+# Example:  getLatestVersion SalesforceFoundation/Cumulus
+getLatestVersion() {
+  VERSION="$(curl -s "https://api.github.com/repos/$1/releases/latest" | jq -r .name)"
+  echo $VERSION
+}
+
+# Get the Salesforce package Id (04t....) from the latest version of a GitHub repository
+# Usage:    getLatestPackageId repo
+# Example:  getLatestPackageId SalesforceFoundation/Cumulus
+getLatestPackageId() {
+  VERSION="$(curl -s "https://api.github.com/repos/$1/releases/latest" | jq .body)"
+  re="installPackage\.apexp\?p0=(04t[a-zA-Z0-9]+)[\\\r\\\n|\"]"
+  if [[ $VERSION =~ $re ]]; then
+    echo ${BASH_REMATCH[1]};
+  else
+    echo "Could not extract package Id from repo: $REPO"
+    exit -1;
+  fi
+}
+
+### BEGIN DEPENDENCIES
+CONTACTS_AND_ORGANIZATIONS_PACKAGE="$(getLatestPackageId SalesforceFoundation/Contacts_and_Organizations)"
+HOUSEHOLDS_PACKAGE="$(getLatestPackageId SalesforceFoundation/Households)"
+RECURRING_DONATIONS_PACKAGE="$(getLatestPackageId SalesforceFoundation/Recurring_Donations)"
+RELATIONSHIPS_PACKAGE="$(getLatestPackageId SalesforceFoundation/Relationships)"
+AFFILIATIONS_PACKAGE="$(getLatestPackageId SalesforceFoundation/Affiliations)"
+NPSP_CORE_PACKAGE="$(getLatestPackageId SalesforceFoundation/Cumulus)"
+NPSP_CORE_VERSION="$(getLatestVersion SalesforceFoundation/Cumulus)"
+### END DEPENDENCIES
+
+echo "Dependencies (automatically fetched from GitHub):"
+echo ""
+echo "  Contacts and Organizations $CONTACTS_AND_ORGANIZATIONS_PACKAGE"
+echo "  Households $HOUSEHOLDS_PACKAGE"
+echo "  Recurring Donations $RECURRING_DONATIONS_PACKAGE"
+echo "  Relationships $RELATIONSHIPS_PACKAGE"
+echo "  Affiliations $AFFILIATIONS_PACKAGE"
+echo "  Cumulus $NPSP_CORE_PACKAGE ($NPSP_CORE_VERSION)"
 echo ""
 
 # Reset current path to be relative to script file
