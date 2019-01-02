@@ -1,5 +1,5 @@
 #!/bin/bash
-# Unofficial Salesforce DX install script for Salesforce.org NonProfite Success Pack (NPSP)
+# Unofficial Salesforce DX install script for Salesforce.org NonProfit Success Pack (NPSP)
 # https://github.com/pozil/npsp-dx-template
 
 # Salesforce DX scratch org alias
