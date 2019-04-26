@@ -105,7 +105,7 @@ sfdx force:package:install --package $NPSP_CORE_PACKAGE -w 10 --noprompt -u $ORG
 echo "" && \
 
 echo "Installing dependency 9/9: Configuration..." && \
-sfdx force:mdapi:deploy -d "temp/cumulus/config/managed" -w 10 -u $ORG_ALIAS && \
+sfdx force:mdapi:deploy -d "temp/cumulus/config/trial" -w 10 -u $ORG_ALIAS && \
 echo "" && \
 
 # Remove temp install dir
