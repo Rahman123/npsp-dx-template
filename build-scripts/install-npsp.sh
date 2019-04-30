@@ -71,6 +71,9 @@ mv "Cumulus-rel-$NPSP_CORE_VERSION/unpackaged/" cumulus && \
 cd .. && \
 echo "" && \
 
+# Workaround for post-install step 9 unless the following gets accepted - https://github.com/SalesforceFoundation/Cumulus/pull/4212
+find temp/cumulus/post/first -type f -exec sed -i '' -e "s/%%%NAMESPACE%%%/npsp__/g" {} \;
+
 # Install dependencies
 echo "Installing dependency 1/9: Opportunity record types..." && \
 sfdx force:mdapi:deploy -d "temp/cumulus/pre/opportunity_record_types" -w 10 -u $ORG_ALIAS && \
@@ -104,8 +107,8 @@ echo "Installing dependency 8/9: Nonprofit success pack..." && \
 sfdx force:package:install --package $NPSP_CORE_PACKAGE -w 10 --noprompt -u $ORG_ALIAS && \
 echo "" && \
 
-echo "Installing dependency 9/9: Configuration..." && \
-sfdx force:mdapi:deploy -d "temp/cumulus/config/trial" -w 10 -u $ORG_ALIAS && \
+echo "Installing dependency 9/9: Post NPSP Configuration..." && \
+sfdx force:mdapi:deploy -d "temp/cumulus/post/first" -w 10 -u $ORG_ALIAS && \
 echo "" && \
 
 # Remove temp install dir
