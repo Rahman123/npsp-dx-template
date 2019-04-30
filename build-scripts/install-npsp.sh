@@ -71,7 +71,7 @@ mv "Cumulus-rel-$NPSP_CORE_VERSION/unpackaged/" cumulus && \
 cd .. && \
 echo "" && \
 
-# Workaround for post-install step 9 unless the following gets accepted - https://github.com/SalesforceFoundation/Cumulus/pull/4212
+# With Step 8 installing the npsp managed package, this updates the token with the prefix
 find temp/cumulus/post/first -type f -exec sed -i '' -e "s/%%%NAMESPACE%%%/npsp__/g" {} \;
 
 # Install dependencies
