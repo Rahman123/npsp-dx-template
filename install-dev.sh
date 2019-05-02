@@ -25,9 +25,10 @@ echo "Installing NPSP" && \
 ./build-scripts/install-npsp.sh $ORG_ALIAS && \
 echo "" && \
 
-echo "Pushing local DX sources..." && \
-sfdx force:source:push -u $ORG_ALIAS && \
-echo "" && \
+# Uncomment this if you have local source code that you want to push
+#echo "Pushing local DX sources..." && \
+#sfdx force:source:push -u $ORG_ALIAS && \
+#echo "" && \
 
 # Get and check last exit code
 echo ""
